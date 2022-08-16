@@ -3,12 +3,7 @@ import { ConfigModule } from "@nestjs/config";
 import { SchoolService } from "./school.service";
 import { SchoolRepository } from "./repository/school.repository";
 import { CommonModule } from "../common/common.module";
-import {
-  ClassInputDto,
-  ClassUpdateDto,
-  SchoolInputDto,
-  SchoolUpdateDto,
-} from "./dto";
+import { SchoolInputDto, SchoolUpdateDto } from "./dto";
 
 describe("SchoolService", () => {
   let service: SchoolService;
@@ -62,12 +57,6 @@ describe("SchoolService", () => {
     expect(result).toBeDefined();
   });
 
-  it(" getSchoolClass ", async () => {
-    const result = await service.getSchoolClass(1);
-    console.log("result=> " + JSON.stringify(result));
-    expect(result).toBeDefined();
-  });
-
   it(" getSchoolClassLikeName ", async () => {
     const result = await service.getSchoolClassLikeName("서울초등학교1");
     console.log("result=> " + JSON.stringify(result));
@@ -88,6 +77,12 @@ describe("SchoolService", () => {
 
   it(" getSchoolClassInnerJoin ", async () => {
     const result = await service.getSchoolClassInnerJoin(1);
+    console.log("result=> " + JSON.stringify(result));
+    expect(result).toBeDefined();
+  });
+
+  it(" getSchoolClassPage ", async () => {
+    const result = await service.getSchoolClassPage(1, 3);
     console.log("result=> " + JSON.stringify(result));
     expect(result).toBeDefined();
   });

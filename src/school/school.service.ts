@@ -87,6 +87,29 @@ export class SchoolService extends BaseService {
     return SchoolDto.toDto(info);
   }
 
+  async getSchoolClassPage(
+    pageNumber: number,
+    pageSize: number
+  ): Promise<SchoolDto[]> {
+    const info = await this.schoolDbNoTran(async (manager) => {
+      const totalCount =
+        await this.schoolRepository.getSchoolClassPageTotalCount(manager);
+      console.log("totalCount=>" + totalCount);
+
+      const list = totalCount
+        ? await this.schoolRepository.getSchoolClassPage(
+            manager,
+            pageNumber,
+            pageSize
+          )
+        : null;
+
+      return { totalCount, list };
+    });
+
+    return info.totalCount ? SchoolDto.toDtoList(info.list) : null;
+  }
+
   async createSchool(schoolInput: SchoolInputDto): Promise<boolean> {
     const schoolId = await this.schoolDbTran(async (manager) => {
       const db = await this.schoolRepository.getSchoolByName(

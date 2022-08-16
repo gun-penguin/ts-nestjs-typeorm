@@ -7,6 +7,7 @@ import {
   ISchoolClassCount,
   ISchoolRaw,
 } from "../../common/db/entity/school/raw";
+import { JoinAttribute } from "typeorm/query-builder/JoinAttribute";
 
 @Injectable()
 export class SchoolRepository {
@@ -144,6 +145,41 @@ export class SchoolRepository {
       .getOne();
 
     return result;
+  }
+
+  // page 사용
+  async getSchoolClassPageTotalCount(manager: EntityManager): Promise<number> {
+    return await manager.createQueryBuilder(SchoolEntity, "s1").getCount();
+  }
+
+  // page 사용
+  async getSchoolClassPage(
+    manager: EntityManager,
+    pageNumber: number = 1,
+    pageSize: number = 10
+  ): Promise<SchoolEntity[]> {
+    const list = await manager
+      .createQueryBuilder(SchoolEntity, "s1")
+      .select("s1.id", "id")
+      .orderBy("s1.id", "ASC")
+      .skip(pageSize * (pageNumber - 1))
+      .take(pageSize)
+      .getRawMany();
+
+    const ids = list.map((item) => {
+      return item.id;
+    });
+
+    return ids && ids.length > 0
+      ? await manager
+          .createQueryBuilder(SchoolEntity, "s")
+          .select(["s.id", "s.name", "c.id", "c.class", "c.grade"])
+          .leftJoin("s.classList", "c")
+          .where("s.id IN (:...ids)", { ids })
+          .orderBy("s.id", "ASC")
+          .addOrderBy("c.id", "DESC")
+          .getMany()
+      : null;
   }
 
   async createSchool(
